@@ -2,6 +2,7 @@ import pandas as pd
 import plotly.express as px
 
 expense_ratio = 1
+daily_expense_ratio = 1/365 # approximately
 
 def calculate_leverage(data, leverage):
 
@@ -23,14 +24,13 @@ def calculate_leverage(data, leverage):
 
 			leverage_value = last_leverage_value * (1 + leverarage_appreciation)
 
+			daily_profit = leverage_value - last_leverage_value
+
 			# I am not sure if the ER calculation is correct
-			if index % 365 == 0:
+			if daily_profit > 0:
+				leverage_value = leverage_value - (daily_profit * daily_expense_ratio)
 
-				profit = leverage_value - leverage_data[index-365]
-
-				if profit > 0:
-					leverage_value -= (profit * (expense_ratio / 100))
-
+			# Just to avoid values like 0.00001
 			if leverage_value < 0.1:
 				leverage_value = 0
 
@@ -58,3 +58,4 @@ fig = px.line(
 )
 
 fig.show()
+fig.write_html('index.html')
